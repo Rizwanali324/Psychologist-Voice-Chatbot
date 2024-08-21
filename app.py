@@ -14,10 +14,11 @@ from audio_recorder_streamlit import audio_recorder
 from utils import audio_bytes_to_wav, speech_to_text, text_to_speech, get_llm_response, create_welcome_message
 from langchain_core.messages import AIMessage, HumanMessage
 
-
 def main():
     st.set_page_config(page_title='Audio-based  Chatbot')
-    st.title("🎤 :blue[Scoopsie Voice Chatbot] 💬🤖")
+    st.title("🎤 :blue[Psychologist Voice Chatbot] 💬🤖")
+    st.sidebar.markdown("# Aibytec")
+    st.sidebar.image('logo.jpg', width=20,use_column_width=True)
 
     # Initialize chat history if not already present
     if "chat_history" not in st.session_state:
@@ -33,12 +34,13 @@ def main():
     if len(st.session_state.chat_history) == 0:
         welcome_audio_path = create_welcome_message()
         st.session_state.chat_history = [
-            AIMessage(content="Hello, I'm Scoopsie your chatbot assistant. How can I help you?", audio_file=welcome_audio_path)  # Urdu greeting with female pronoun
+            AIMessage(content="Hello, I'm psychologist your chatbot assistant. How can I help you?", audio_file=welcome_audio_path)  # Urdu greeting with female pronoun
         ]
         st.session_state.played_audios[welcome_audio_path] = False
 
     # Sidebar with mic button on top
     with st.sidebar:
+        
         audio_bytes = audio_recorder(
             text="Record your voice message",
             recording_color="#e8b62c",
@@ -82,7 +84,7 @@ def main():
             # Initialize a new chat history with the default welcome message
             welcome_audio_path = create_welcome_message()
             st.session_state.chat_history = [
-                AIMessage(content="Hello, I'm Scoopsie your chatbot assistant. How can I help you?", audio_file=welcome_audio_path)  # Urdu greeting with female pronoun
+                AIMessage(content="Hello, I'm psychologist your chatbot assistant. How can I help you?", audio_file=welcome_audio_path)  # Urdu greeting with female pronoun
             ]
             st.session_state.played_audios[welcome_audio_path] = False
     
