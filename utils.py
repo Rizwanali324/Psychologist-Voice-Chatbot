@@ -35,29 +35,43 @@ def audio_bytes_to_wav(audio_bytes):
         st.error(f"Error during WAV file conversion: {e}")
         return None
 
+def split_audio(file_path, chunk_length_ms):
+    audio = AudioSegment.from_wav(file_path)
+    return [audio[i:i + chunk_length_ms] for i in range(0, len(audio), chunk_length_ms)]
+
 def speech_to_text(audio_bytes):
     try:
         # Convert the audio bytes to WAV
         temp_wav_path = audio_bytes_to_wav(audio_bytes)
-        
+
         if temp_wav_path is None:
             return "Error"
 
-        # Check the file size
-        if os.path.getsize(temp_wav_path) > 25 * 1024 * 1024:
-            st.error("File size exceeds the 25 MB limit. Please upload a smaller file.")
+        # Increase file size limit
+        if os.path.getsize(temp_wav_path) > 50 * 1024 * 1024:
+            st.error("File size exceeds the 50 MB limit. Please upload a smaller file.")
             return "Error"
 
-        # Use Groq's Whisper API for transcription in English
-        with open(temp_wav_path, "rb") as file:
-            transcription = client.audio.transcriptions.create(
-                file=("audio.wav", file.read()),  # Ensure correct file format and MIME type
-                model="whisper-large-v3",
-                response_format="text",
-                language="en",
-                temperature=0.0
-            )
-        return transcription
+        # Define chunk length (e.g., 5 minutes = 5 * 60 * 1000 milliseconds)
+        chunk_length_ms = 5 * 60 * 1000
+        chunks = split_audio(temp_wav_path, chunk_length_ms)
+
+        transcription = ""
+        for chunk in chunks:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_chunk:
+                chunk.export(temp_chunk.name, format="wav")
+                with open(temp_chunk.name, "rb") as file:
+                    chunk_transcription = client.audio.transcriptions.create(
+                        file=("audio.wav", file.read()),
+                        model="whisper-large-v3",
+                        response_format="text",
+                        language="en",
+                        temperature=0.0,
+
+                    )
+                    transcription += chunk_transcription + " "
+
+        return transcription.strip()
     except Exception as e:
         st.error(f"Error during speech-to-text conversion: {e}")
         return "Error"
@@ -104,7 +118,10 @@ def get_llm_response(query, chat_history):
 
                 Professionalism: Maintain a high level of expertise and ethical standards.
                 Cultural Authenticity: Understand and reflect the values, beliefs, and customs relevant to the user’s cultural context.
-                Empathy: Show genuine compassion and support for the user's emotional well-being.                 
+                Empathy: Show genuine compassion and support for the user's emotional well-being.
+                You do not provide information outside of this 
+                  scope. If a question is not about psychologist,mental health, respond with,
+                 "I specialize only in psychologist,mental health related queries."                 
                  **Chat History:** {chat_history}
 
                 **User:** {user_query}
