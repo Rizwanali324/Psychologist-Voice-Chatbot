@@ -1,6 +1,7 @@
 # AI Voice Psychologist Chatbot
 
 This AI-based psychologist chatbot offers users an interactive and engaging platform for voice-based communication. Using advanced natural language processing (NLP) techniques and machine learning, the chatbot simulates a conversation with a psychologist, providing insights and responses to user inputs.
+![Voice Chatbot](https://github.com/Rizwanali324/Psychologist-Voice-Chatbot/blob/main/vioce%20chatbot.png)
 
 ## Features
 - **Voice Recognition**: Users can interact with the chatbot via voice inputs.
